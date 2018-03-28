@@ -47,13 +47,18 @@ func IsExtendedResourceName(name v1.ResourceName) bool {
 	return true
 }
 
+// IsDefaultnamespaceContainingResource returns true if the resource name is in the
+// *kubernetes.io/ namespace.
+func IsDefaultNamespaceContainingResource(name v1.ResourceName) bool {
+	return strings.Contains(string(name), v1.ResourceDefaultNamespacePrefix)
+}
+
 // IsDefaultNamespaceResource returns true if the resource name is in the
 // *kubernetes.io/ namespace. Partially-qualified (unprefixed) names are
 // implicitly in the kubernetes.io/ namespace.
 func IsDefaultNamespaceResource(name v1.ResourceName) bool {
 	return !strings.Contains(string(name), "/") ||
-		strings.Contains(string(name), v1.ResourceDefaultNamespacePrefix)
-
+		IsDefaultNamespaceContainingResource(name)
 }
 
 // IsHugePageResourceName returns true if the resource name has the huge page
@@ -92,7 +97,8 @@ func IsOvercommitAllowed(name v1.ResourceName) bool {
 
 // Extended and Hugepages resources
 func IsScalarResourceName(name v1.ResourceName) bool {
-	return IsExtendedResourceName(name) || IsHugePageResourceName(name)
+	return IsExtendedResourceName(name) || IsHugePageResourceName(name) ||
+		IsDefaultNamespaceContainingResource(name)
 }
 
 // this function aims to check if the service's ClusterIP is set or not
