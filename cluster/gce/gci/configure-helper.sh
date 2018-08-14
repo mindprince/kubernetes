@@ -2403,7 +2403,11 @@ EOF
     setup-addon-manifests "addons" "metrics-server"
   fi
   if [[ "${ENABLE_NVIDIA_GPU_DEVICE_PLUGIN:-}" == "true" ]]; then
-    setup-addon-manifests "addons" "device-plugins/nvidia-gpu"
+    if [[ "${NODE_OS_DISTRIBUTION:-}" == "ubuntu" ]]; then
+      setup-addon-manifests "addons" "device-plugins/nvidia-gpu/ubuntu"
+    else
+      setup-addon-manifests "addons" "device-plugins/nvidia-gpu/cos"
+    fi
   fi
   if [[ "${ENABLE_CLUSTER_DNS:-}" == "true" ]]; then
     if [[ "${CLUSTER_DNS_CORE_DNS:-}" == "true" ]]; then
